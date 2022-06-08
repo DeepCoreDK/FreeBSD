@@ -26,7 +26,7 @@
 #include <sys/_cpuset.h>
 #include <sys/bus.h>
 
-#include <machine/intr_machdep.h>
+#include <machine/interrupt.h>
 
 INTERFACE pic;
 
