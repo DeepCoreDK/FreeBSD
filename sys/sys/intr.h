@@ -41,6 +41,8 @@
 
 typedef struct intr_irqsrc interrupt_t;
 
+#include <sys/interrupt.h>
+
 /* FreeBSD standard interrupt controller interface */
 
 #define	INTR_IRQ_INVALID	0xFFFFFFFF

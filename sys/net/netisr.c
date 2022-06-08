@@ -71,7 +71,6 @@
 #include <sys/kernel.h>
 #include <sys/kthread.h>
 #include <sys/malloc.h>
-#include <sys/interrupt.h>
 #include <sys/lock.h>
 #include <sys/mbuf.h>
 #include <sys/mutex.h>
@@ -87,6 +86,8 @@
 #ifdef DDB
 #include <ddb/ddb.h>
 #endif
+
+#include <machine/interrupt.h>
 
 #define	_WANT_NETISR_INTERNAL	/* Enable definitions from netisr_internal.h */
 #include <net/if.h>

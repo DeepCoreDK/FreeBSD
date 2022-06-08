@@ -32,6 +32,8 @@
 
 typedef struct powerpc_intr interrupt_t;
 
+#include <sys/interrupt.h>
+
 /* FreeBSD standard interrupt controller interface */
 
 #define	INTR_VECTORS	256

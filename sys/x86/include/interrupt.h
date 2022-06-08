@@ -36,6 +36,8 @@
 
 typedef struct intsrc interrupt_t;
 
+#include <sys/interrupt.h>
+
 DECLARE_CLASS(pic_base_class);
 
 /* FreeBSD standard interrupt controller interface */
