@@ -76,6 +76,8 @@
 #include <isa/isavar.h>
 #endif
 
+#include "pic_if.h"
+
 int	clkintr_pending;
 #ifndef TIMER_FREQ
 #define TIMER_FREQ   1193182

@@ -60,6 +60,8 @@
 #include <machine/specialreg.h>
 #include <dev/pci/pcivar.h>
 
+#include "pic_if.h"
+
 /* Fields in address for Intel MSI messages. */
 #define	MSI_INTEL_ADDR_DEST		0x000ff000
 #define	MSI_INTEL_ADDR_RH		0x00000008
@@ -136,7 +138,7 @@ static int	msi_config_intr(x86pic_t pic, struct intsrc *isrc,
 static int	msi_assign_cpu(x86pic_t pic, struct intsrc *isrc,
 		    u_int apic_id);
 
-x86pic_func_t msi_pic = {
+x86pic_func_t msi_funcs = {
 	X86PIC_FUNC(pic_enable_source,		msi_enable_source),
 	X86PIC_FUNC(pic_disable_source,		msi_eoi_source),
 	X86PIC_FUNC(pic_eoi_source,		msi_eoi_source),
@@ -148,6 +150,11 @@ x86pic_func_t msi_pic = {
 
 	X86PIC_END
 };
+
+DEFINE_CLASS_1(msi, msi_class, msi_funcs, sizeof(pic_base_softc_t),
+    pic_base_class);
+
+static device_t msi_pic;
 
 u_int first_msi_irq;
 SYSCTL_UINT(_machdep, OID_AUTO, first_msi_irq, CTLFLAG_RD, &first_msi_irq, 0,
@@ -351,7 +358,8 @@ msi_init(void)
 	num_io_irqs = first_msi_irq + num_msi_irqs;
 
 	msi_enabled = 1;
-	intr_register_pic(&msi_pic);
+	msi_pic = intr_create_pic("msi_pic", 0, &msi_class);
+	intr_register_pic(msi_pic);
 	mtx_init(&msi_lock, "msi", NULL, MTX_DEF);
 }
 
@@ -371,7 +379,7 @@ msi_create_source(void)
 	mtx_unlock(&msi_lock);
 
 	msi = malloc(sizeof(struct msi_intsrc), M_MSI, M_WAITOK | M_ZERO);
-	msi->msi_intsrc.is_pic = &msi_pic;
+	msi->msi_intsrc.is_pic = msi_pic;
 	msi->msi_irq = irq;
 	intr_register_source(irq, &msi->msi_intsrc);
 	nexus_add_irq(irq);

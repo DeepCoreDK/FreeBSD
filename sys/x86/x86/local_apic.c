@@ -78,6 +78,8 @@
 #include <ddb/ddb.h>
 #endif
 
+#include "pic_if.h"
+
 #ifdef __amd64__
 #define	SDT_APIC	SDT_SYSIGT
 #define	GSEL_APIC	0
@@ -352,10 +354,15 @@ static int	lapic_et_stop(struct eventtimer *et);
 static u_int	apic_idt_to_irq(u_int apic_id, u_int vector);
 static void	lapic_set_tpr(u_int vector);
 
-x86pic_func_t lapic_pic = {
+x86pic_func_t lapic_funcs = {
 	X86PIC_FUNC(pic_resume,			lapic_resume),
 	X86PIC_END
 };
+
+DEFINE_CLASS_1(lapic, lapic_class, lapic_funcs, sizeof(pic_base_softc_t),
+    pic_base_class);
+
+static device_t lapic_pic;
 
 static uint32_t
 lvt_mode_impl(struct lapic *la, struct lvt *lvt, u_int pin, uint32_t value)
@@ -1932,7 +1939,8 @@ apic_setup_io(void *dummy __unused)
 	 * Local APIC must be registered before other PICs and pseudo PICs
 	 * for proper suspend/resume order.
 	 */
-	intr_register_pic(&lapic_pic);
+	lapic_pic = intr_create_pic("lapic", 0, &lapic_class);
+	intr_register_pic(lapic_pic);
 
 	retval = best_enum->apic_setup_io();
 	if (retval != 0)

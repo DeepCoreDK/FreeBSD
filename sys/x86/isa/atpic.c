@@ -55,6 +55,8 @@
 #include <isa/isareg.h>
 #include <isa/isavar.h>
 
+#include "pic_if.h"
+
 #define	X86PIC_TYPE atpic
 
 #ifdef __amd64__
@@ -93,7 +95,6 @@ inthand_t
 	IDTVEC(atpic_intr14_pti), IDTVEC(atpic_intr15_pti);
 
 #define	ATPIC(io, base, eoi) {						\
-		.at_pic = atpic_funcs,					\
 		.at_eoi_func = (eoi),					\
 		.at_ioaddr = (io),					\
 		.at_irqbase = (base),					\
@@ -103,7 +104,6 @@ inthand_t
 
 #define	INTSRC(irq)							\
 	{								\
-		.at_intsrc = { &atpics[(irq) / 8].at_pic },		\
 		.at_intr = IDTVEC(atpic_intr ## irq ),			\
 		.at_intr_pti = IDTVEC(atpic_intr ## irq ## _pti),	\
 		.at_irq = (irq) % 8,					\
@@ -120,8 +120,6 @@ struct atpic {
 };
 _Static_assert(offsetof(struct atpic, pic_base_softc) == 0,
     ".pic_base_softc misaligned from structure!");
-_Static_assert(offsetof(struct atpic, at_pic) == 0,
-    ".at_pic misaligned from structure!");
 
 struct atpic_intsrc {
 	struct intsrc at_intsrc;
@@ -162,6 +160,8 @@ const x86pic_func_t atpic_funcs = {
 	X86PIC_END
 };
 
+DEFINE_CLASS_1(atpic, atpic_class, atpic_funcs, 0, pic_base_class);
+
 static struct atpic atpics[] = {
 	ATPIC(IO_ICU1, 0, atpic_eoi_master),
 	ATPIC(IO_ICU2, 8, atpic_eoi_slave)
@@ -192,7 +192,7 @@ static __inline void
 _atpic_eoi_master(struct intsrc *isrc)
 {
 
-	KASSERT(isrc->is_pic == &atpics[MASTER].at_pic,
+	KASSERT(isrc->is_pic == atpics[MASTER].at_pic,
 	    ("%s: mismatched pic", __func__));
 #ifndef AUTO_EOI_1
 	outb(atpics[MASTER].at_ioaddr, OCW2_EOI);
@@ -207,7 +207,7 @@ static __inline void
 _atpic_eoi_slave(struct intsrc *isrc)
 {
 
-	KASSERT(isrc->is_pic == &atpics[SLAVE].at_pic,
+	KASSERT(isrc->is_pic == atpics[SLAVE].at_pic,
 	    ("%s: mismatched pic", __func__));
 #ifndef AUTO_EOI_2
 	outb(atpics[SLAVE].at_ioaddr, OCW2_EOI);
@@ -247,6 +247,7 @@ atpic_register_sources(x86pic_t pic)
 
 	/* Loop through all interrupt sources and add them. */
 	for (i = 0, ai = atintrs; i < NUM_ISA_IRQS; i++, ai++) {
+		ai->at_intsrc.is_pic = atpics[i / 8].at_pic;
 		if (i == ICU_SLAVEID)
 			continue;
 		intr_register_source(i, &ai->at_intsrc);
@@ -284,7 +285,7 @@ atpic_disable_source(x86pic_t pic, struct intsrc *isrc)
 	 * a function pointer.  All of the referenced variables should
 	 * still be hot in the cache.
 	 */
-	if (isrc->is_pic == &atpics[MASTER].at_pic)
+	if (isrc->is_pic == atpics[MASTER].at_pic)
 		_atpic_eoi_master(isrc);
 	else
 		_atpic_eoi_slave(isrc);
@@ -533,7 +534,9 @@ atpic_init(void *dummy __unused)
 	 */
 	for (i = 0; i < nitems(atpics); ++i) {
 		struct atpic *ap = atpics + i;
-		intr_register_pic(&ap->at_pic);
+		ap->at_pic = intr_create_pic("atpic", i, &atpic_class);
+		device_set_softc(ap->at_pic, ap);
+		intr_register_pic(ap->at_pic);
 	}
 
 	if (num_io_irqs == 0)
