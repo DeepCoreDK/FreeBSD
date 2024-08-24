@@ -108,7 +108,7 @@ inthand_t
 	}
 
 struct atpic {
-	struct pic at_pic;
+	x86pics_t	at_pic;
 	void	(*at_eoi_func)(struct intsrc *isrc);
 	int	at_ioaddr;
 	int	at_irqbase;
@@ -125,7 +125,7 @@ struct atpic_intsrc {
 	u_long	at_straycount;
 };
 
-static void atpic_register_sources(struct pic *pic);
+static void atpic_register_sources(x86pic_t pic);
 static void atpic_enable_source(struct intsrc *isrc);
 static void atpic_disable_source(struct intsrc *isrc);
 static void atpic_eoi(struct intsrc *isrc);
@@ -133,24 +133,26 @@ static void atpic_eoi_master(struct intsrc *isrc);
 static void atpic_eoi_slave(struct intsrc *isrc);
 static void atpic_enable_intr(struct intsrc *isrc);
 static void atpic_disable_intr(struct intsrc *isrc);
-static void atpic_resume(struct pic *pic, bool suspend_cancelled);
+static void atpic_resume(x86pic_t pic, bool suspend_cancelled);
 static int atpic_source_pending(struct intsrc *isrc);
 static int atpic_config_intr(struct intsrc *isrc, enum intr_trigger trig,
     enum intr_polarity pol);
 static int atpic_assign_cpu(struct intsrc *isrc, u_int apic_id);
 static void i8259_init(struct atpic *pic, int slave);
 
-const struct pic atpic_funcs = {
-	.pic_register_sources = atpic_register_sources,
-	.pic_enable_source = atpic_enable_source,
-	.pic_disable_source = atpic_disable_source,
-	.pic_eoi_source = atpic_eoi,
-	.pic_enable_intr = atpic_enable_intr,
-	.pic_disable_intr = atpic_disable_intr,
-	.pic_source_pending = atpic_source_pending,
-	.pic_resume = atpic_resume,
-	.pic_config_intr = atpic_config_intr,
-	.pic_assign_cpu = atpic_assign_cpu,
+const x86pic_func_t atpic_funcs = {
+	X86PIC_FUNC(pic_register_sources,	atpic_register_sources),
+	X86PIC_FUNC(pic_enable_source,		atpic_enable_source),
+	X86PIC_FUNC(pic_disable_source,		atpic_disable_source),
+	X86PIC_FUNC(pic_eoi_source,		atpic_eoi),
+	X86PIC_FUNC(pic_enable_intr,		atpic_enable_intr),
+	X86PIC_FUNC(pic_disable_intr,		atpic_disable_intr),
+	X86PIC_FUNC(pic_source_pending,		atpic_source_pending),
+	X86PIC_FUNC(pic_resume,			atpic_resume),
+	X86PIC_FUNC(pic_config_intr,		atpic_config_intr),
+	X86PIC_FUNC(pic_assign_cpu,		atpic_assign_cpu),
+
+	X86PIC_END
 };
 
 static struct atpic atpics[] = {
@@ -209,7 +211,7 @@ _atpic_eoi_slave(struct intsrc *isrc)
 }
 
 static void
-atpic_register_sources(struct pic *pic)
+atpic_register_sources(x86pic_t pic)
 {
 	struct atpic *ap = (struct atpic *)pic;
 	struct atpic_intsrc *ai;
@@ -340,7 +342,7 @@ atpic_source_pending(struct intsrc *isrc)
 }
 
 static void
-atpic_resume(struct pic *pic, bool suspend_cancelled)
+atpic_resume(x86pic_t pic, bool suspend_cancelled)
 {
 	struct atpic *ap = (struct atpic *)pic;
 
