@@ -96,6 +96,42 @@ struct pic {
 	TAILQ_ENTRY(pic) pics;
 };
 
+/* Wrappers for potential transition to kobj */
+#define	PIC_REGISTER_SOURCES(pic) \
+		do {							\
+			if ((pic)->pic_register_sources != NULL)	\
+				((pic)->pic_register_sources(pic));	\
+		} while(0)
+#define	PIC_ENABLE_SOURCE(pic, isrc) \
+		((pic)->pic_enable_source((pic), (isrc)))
+#define	PIC_DISABLE_SOURCE(pic, isrc) \
+		((pic)->pic_disable_source((pic), (isrc)))
+#define	PIC_EOI_SOURCE(pic, isrc)	((pic)->pic_eoi_source((pic), (isrc)))
+#define	PIC_ENABLE_INTR(pic, isrc)	((pic)->pic_enable_intr((pic), (isrc)))
+#define	PIC_DISABLE_INTR(pic, isrc)	((pic)->pic_disable_intr((pic), (isrc)))
+#define PIC_SOURCE_PENDING(pic, isrc) \
+		((pic)->pic_source_pending != NULL ? \
+		    (pic)->pic_source_pending((pic), (isrc)) : 0)
+#define	PIC_SUSPEND(pic) \
+		do {							\
+			if ((pic)->pic_suspend != NULL)			\
+				((pic)->pic_suspend(pic));		\
+		} while(0)
+#define	PIC_RESUME(pic, cancel) \
+		do {							\
+			if ((pic)->pic_resume != NULL)			\
+				((pic)->pic_resume((pic), (cancel)));	\
+		} while(0)
+#define	PIC_CONFIG_INTR(pic, isrc, trigger, polarity) \
+		((pic)->pic_config_intr((pic), (isrc), (trigger), (polarity)))
+#define	PIC_ASSIGN_CPU(pic, isrc, apic_id) \
+		((pic)->pic_assign_cpu((pic), (isrc), (apic_id)))
+#define	PIC_REPROGRAM_PIN(pic, isrc) \
+		do {							\
+			if ((pic)->pic_reprogram_pin != NULL)		\
+				((pic)->pic_reprogram_pin((pic), (isrc))); \
+		} while(0)
+
 /*
  * An interrupt source.  The upper-layer code uses the PIC methods to
  * control a given source.  The lower-layer PIC drivers can store additional
