@@ -440,11 +440,8 @@ static device_method_t bcm_intc_methods[] = {
 	{ 0, 0 }
 };
 
-static driver_t bcm_intc_driver = {
-	"intc",
-	bcm_intc_methods,
-	sizeof(struct bcm_intc_softc),
-};
+DEFINE_CLASS_1(intc, bcm_intc_driver, bcm_intc_methods,
+    sizeof(struct bcm_intc_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(intc, simplebus, bcm_intc_driver, 0, 0,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_MIDDLE);

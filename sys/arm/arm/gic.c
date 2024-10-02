@@ -1253,8 +1253,8 @@ static device_method_t arm_gic_methods[] = {
 	{ 0, 0 }
 };
 
-DEFINE_CLASS_0(gic, arm_gic_driver, arm_gic_methods,
-    sizeof(struct arm_gic_softc));
+DEFINE_CLASS_1(gic, arm_gic_driver, arm_gic_methods,
+    sizeof(struct arm_gic_softc), pic_base_class);
 
 #ifdef DDB
 DB_SHOW_COMMAND_FLAGS(gic, db_show_gic, CS_OWN)

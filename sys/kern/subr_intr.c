@@ -674,6 +674,12 @@ intr_isrc_assign_cpu(void *arg, int cpu)
 #endif
 }
 
+static device_method_t pic_base_funcs[] = {
+	DEVMETHOD_END
+};
+
+DEFINE_CLASS(pic_base, pic_base_funcs, 0);
+
 /*
  *  Create interrupt event for interrupt source.
  */

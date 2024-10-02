@@ -239,7 +239,7 @@ static device_method_t omap4_wugen_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(omap4_wugen, omap4_wugen_driver, omap4_wugen_methods,
-    sizeof(struct omap4_wugen_sc));
+DEFINE_CLASS_1(omap4_wugen, omap4_wugen_driver, omap4_wugen_methods,
+    sizeof(struct omap4_wugen_sc), pic_base_class);
 EARLY_DRIVER_MODULE(omap4_wugen, simplebus, omap4_wugen_driver, NULL, NULL,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_MIDDLE + 1);

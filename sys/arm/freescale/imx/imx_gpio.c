@@ -946,11 +946,8 @@ static device_method_t imx51_gpio_methods[] = {
 	{0, 0},
 };
 
-static driver_t imx51_gpio_driver = {
-	"gpio",
-	imx51_gpio_methods,
-	sizeof(struct imx51_gpio_softc),
-};
+DEFINE_CLASS_1(gpio, imx51_gpio_driver, imx51_gpio_methods,
+    sizeof(struct imx51_gpio_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(imx51_gpio, simplebus, imx51_gpio_driver, 0, 0,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_LATE);

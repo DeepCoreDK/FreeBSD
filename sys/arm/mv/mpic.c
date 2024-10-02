@@ -387,11 +387,8 @@ static device_method_t mv_mpic_methods[] = {
 	{ 0, 0 }
 };
 
-static driver_t mv_mpic_driver = {
-	"mpic",
-	mv_mpic_methods,
-	sizeof(struct mv_mpic_softc),
-};
+DEFINE_CLASS_1(mpic, mv_mpic_driver, mv_mpic_methods,
+    sizeof(struct mv_mpic_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(mpic, simplebus, mv_mpic_driver, 0, 0,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_LATE);

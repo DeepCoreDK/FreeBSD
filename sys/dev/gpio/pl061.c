@@ -575,4 +575,5 @@ static device_method_t pl061_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(gpio, pl061_driver, pl061_methods, sizeof(struct pl061_softc));
+DEFINE_CLASS_1(gpio, pl061_driver, pl061_methods, sizeof(struct pl061_softc),
+    pic_base_class);

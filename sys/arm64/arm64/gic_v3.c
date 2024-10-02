@@ -158,8 +158,8 @@ static device_method_t gic_v3_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(gic, gic_v3_driver, gic_v3_methods,
-    sizeof(struct gic_v3_softc));
+DEFINE_CLASS_1(gic, gic_v3_driver, gic_v3_methods,
+    sizeof(struct gic_v3_softc), pic_base_class);
 
 /*
  * Driver-specific definitions.

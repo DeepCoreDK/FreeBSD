@@ -1563,11 +1563,8 @@ static device_method_t aw_gpio_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t aw_gpio_driver = {
-	"gpio",
-	aw_gpio_methods,
-	sizeof(struct aw_gpio_softc),
-};
+DEFINE_CLASS_1(gpio, aw_gpio_driver, aw_gpio_methods,
+    sizeof(struct aw_gpio_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(aw_gpio, simplebus, aw_gpio_driver, 0, 0,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_LATE);

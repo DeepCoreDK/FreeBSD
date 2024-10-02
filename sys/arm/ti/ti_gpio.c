@@ -1116,8 +1116,5 @@ static device_method_t ti_gpio_methods[] = {
 	{0, 0},
 };
 
-driver_t ti_gpio_driver = {
-	"gpio",
-	ti_gpio_methods,
-	sizeof(struct ti_gpio_softc),
-};
+DEFINE_CLASS_1(gpio, ti_gpio_driver, ti_gpio_methods,
+    sizeof(struct ti_gpio_softc), pic_base_class);
