@@ -165,11 +165,7 @@ static device_method_t ehci_ps3_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t ehci_ps3_driver = {
-	.name = "ehci",
-	.methods = ehci_ps3_methods,
-	.size = sizeof(ehci_softc_t),
-};
+DEFINE_CLASS_0(ehci, ehci_ps3_driver, ehci_ps3_methods, sizeof(ehci_softc_t));
 
 DRIVER_MODULE(ehci_ps3, ps3bus, ehci_ps3_driver, 0, 0);
 MODULE_DEPEND(ehci_ps3, usb, 1, 1, 1);

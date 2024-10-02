@@ -1032,7 +1032,8 @@ static device_method_t ofwfb_sc_methods[] = {
   	DEVMETHOD(device_identify,	ofwfb_scidentify),
 	DEVMETHOD(device_probe,		ofwfb_scprobe),
 	DEVMETHOD(device_attach,	ofwfb_scattach),
-	{ 0, 0 }
+
+	DEVMETHOD_END
 };
 
 static driver_t ofwfb_sc_driver = {

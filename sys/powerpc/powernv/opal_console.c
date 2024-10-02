@@ -104,11 +104,8 @@ static device_method_t uart_opal_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t uart_opal_driver = {
-	"uart",
-	uart_opal_methods,
-	sizeof(struct uart_opal_softc),
-};
+DEFINE_CLASS_0(uart, uart_opal_driver, uart_opal_methods,
+    sizeof(struct uart_opal_softc));
 
 DRIVER_MODULE(uart_opal, opalcons, uart_opal_driver, 0, 0);
 
@@ -604,10 +601,6 @@ static device_method_t opalcons_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t opalcons_driver = {
-        "opalcons",
-        opalcons_methods,
-        0
-};
+DEFINE_CLASS_0(opalcons, opalcons_driver, opalcons_methods, 0);
 
 DRIVER_MODULE(opalcons, opal, opalcons_driver, 0, 0);

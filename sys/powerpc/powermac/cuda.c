@@ -104,11 +104,7 @@ static device_method_t  cuda_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t cuda_driver = {
-	"cuda",
-	cuda_methods,
-	sizeof(struct cuda_softc),
-};
+DEFINE_CLASS_0(cuda, cuda_driver, cuda_methods, sizeof(struct cuda_softc));
 
 DRIVER_MODULE(cuda, macio, cuda_driver, 0, 0);
 DRIVER_MODULE(adb, cuda, adb_driver, 0, 0);

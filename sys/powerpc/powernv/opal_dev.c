@@ -85,11 +85,7 @@ static device_method_t  opaldev_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t opaldev_driver = {
-	"opal",
-	opaldev_methods,
-	0
-};
+DEFINE_CLASS_0(opal, opaldev_driver, opaldev_methods, 0);
 
 EARLY_DRIVER_MODULE(opaldev, ofwbus, opaldev_driver, 0, 0, BUS_PASS_BUS);
 
