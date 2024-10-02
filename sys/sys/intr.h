@@ -37,6 +37,8 @@
 #error "sys/intr.h included without architecture interrupt header!"
 #endif
 
+#define INTR_EVENT_SOURCE_POINTERS
+
 /* FreeBSD standard interrupt controller interface */
 
 #include <sys/kobj.h>
