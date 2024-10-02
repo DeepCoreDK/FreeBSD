@@ -253,8 +253,8 @@ static device_method_t fsl_pcib_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_1(pcib, fsl_pcib_driver, fsl_pcib_methods,
-    sizeof(struct fsl_pcib_softc), ofw_pcib_driver);
+DEFINE_CLASS_2(pcib, fsl_pcib_driver, fsl_pcib_methods,
+    sizeof(struct fsl_pcib_softc), ofw_pcib_driver, pic_base_class);
 EARLY_DRIVER_MODULE(pcib, ofwbus, fsl_pcib_driver, 0, 0, BUS_PASS_BUS);
 
 static void
@@ -947,8 +947,8 @@ static device_method_t fsl_msi_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(fsl_msi, fsl_msi_driver, fsl_msi_methods,
-    sizeof(struct fsl_msi_softc));
+DEFINE_CLASS_1(fsl_msi, fsl_msi_driver, fsl_msi_methods,
+    sizeof(struct fsl_msi_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(fsl_msi, simplebus, fsl_msi_driver, 0, 0,
     BUS_PASS_INTERRUPT + 1);

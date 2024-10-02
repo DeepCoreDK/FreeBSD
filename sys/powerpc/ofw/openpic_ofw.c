@@ -86,8 +86,8 @@ static device_method_t  openpic_ofw_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(openpic, openpic_ofw_driver, openpic_ofw_methods,
-    sizeof(struct openpic_softc));
+DEFINE_CLASS_1(openpic, openpic_ofw_driver, openpic_ofw_methods,
+    sizeof(struct openpic_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(openpic, ofwbus, openpic_ofw_driver, 0, 0,
     BUS_PASS_INTERRUPT);

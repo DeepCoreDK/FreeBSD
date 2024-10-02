@@ -94,7 +94,7 @@ static device_method_t vdevice_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(vdevice, vdevice_driver, vdevice_methods, 0);
+DEFINE_CLASS_1(vdevice, vdevice_driver, vdevice_methods, 0, pic_base_class);
 
 DRIVER_MODULE(vdevice, ofwbus, vdevice_driver, 0, 0);
 

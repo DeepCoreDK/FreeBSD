@@ -165,8 +165,8 @@ struct opalpci_softc {
 	struct resource *r_reg;
 };
 
-DEFINE_CLASS_1(pcib, opalpci_driver, opalpci_methods,
-    sizeof(struct opalpci_softc), ofw_pcib_driver);
+DEFINE_CLASS_2(pcib, opalpci_driver, opalpci_methods,
+    sizeof(struct opalpci_softc), ofw_pcib_driver, pic_base_class);
 EARLY_DRIVER_MODULE(opalpci, ofwbus, opalpci_driver, 0, 0, BUS_PASS_BUS);
 
 static int

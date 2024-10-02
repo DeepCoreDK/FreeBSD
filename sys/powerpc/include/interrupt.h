@@ -30,9 +30,13 @@
 
 /* FreeBSD standard interrupt controller interface */
 
+#include <sys/kobj.h>
+
 typedef struct powerpc_intr interrupt_t;
 
 #include <sys/interrupt.h>
+
+DECLARE_CLASS(pic_base_class);
 
 /* FreeBSD standard interrupt controller interface */
 

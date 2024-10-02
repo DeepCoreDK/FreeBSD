@@ -188,9 +188,10 @@ struct xive_cpu {
 	uint32_t	chip;
 };
 
-DEFINE_CLASS_0(xive, xive_driver, xive_methods, sizeof(struct xive_softc));
+DEFINE_CLASS_1(xive, xive_driver, xive_methods, sizeof(struct xive_softc),
+    pic_base_class);
 
-DEFINE_CLASS_0(xivevc, xics_driver, xics_methods, 0);
+DEFINE_CLASS_1(xivevc, xics_driver, xics_methods, 0, pic_base_class);
 
 EARLY_DRIVER_MODULE(xive, ofwbus, xive_driver, 0, 0, BUS_PASS_INTERRUPT - 1);
 EARLY_DRIVER_MODULE(xivevc, ofwbus, xics_driver, 0, 0, BUS_PASS_INTERRUPT);

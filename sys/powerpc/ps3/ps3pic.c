@@ -83,8 +83,8 @@ static device_method_t  ps3pic_methods[] = {
 	DEVMETHOD_END
 };
 
-DEFINE_CLASS_0(ps3pic, ps3pic_driver ps3pic_methods,
-    sizeof(struct ps3pic_softc));
+DEFINE_CLASS_1(ps3pic, ps3pic_driver, ps3pic_methods,
+    sizeof(struct ps3pic_softc), pic_base_class);
 
 DRIVER_MODULE(ps3pic, nexus, ps3pic_driver, 0, 0);
 
