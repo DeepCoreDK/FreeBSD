@@ -30,6 +30,10 @@
 
 INTERFACE pic;
 
+HEADER {
+	#include "intr_event_if.h"
+};
+
 CODE {
 	static void
 	null_pic_generic(device_t pic)
