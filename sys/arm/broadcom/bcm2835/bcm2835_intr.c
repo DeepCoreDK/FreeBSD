@@ -431,13 +431,16 @@ static device_method_t bcm_intc_methods[] = {
 	DEVMETHOD(device_probe,		bcm_intc_probe),
 	DEVMETHOD(device_attach,	bcm_intc_attach),
 
+	/* Interrupt event interface */
+	DEVMETHOD(intr_event_pre_ithread,	bcm_intc_pre_ithread),
+	DEVMETHOD(intr_event_post_ithread,	bcm_intc_post_ithread),
+	DEVMETHOD(intr_event_post_filter,	bcm_intc_post_filter),
+
 	DEVMETHOD(pic_disable_intr,	bcm_intc_disable_intr),
 	DEVMETHOD(pic_enable_intr,	bcm_intc_enable_intr),
 	DEVMETHOD(pic_map_intr,		bcm_intc_map_intr),
-	DEVMETHOD(pic_post_filter,	bcm_intc_post_filter),
-	DEVMETHOD(pic_post_ithread,	bcm_intc_post_ithread),
-	DEVMETHOD(pic_pre_ithread,	bcm_intc_pre_ithread),
-	{ 0, 0 }
+
+	DEVMETHOD_END
 };
 
 DEFINE_CLASS_1(intc, bcm_intc_driver, bcm_intc_methods,
