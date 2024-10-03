@@ -145,10 +145,11 @@ static int atpic_assign_cpu(x86pic_t pic, struct intsrc *isrc, u_int apic_id);
 static void i8259_init(struct atpic *pic, int slave);
 
 const x86pic_func_t atpic_funcs = {
+	DEVMETHOD(intr_event_pre_ithread,	atpic_disable_source),
+	DEVMETHOD(intr_event_post_ithread,	atpic_enable_source),
+	DEVMETHOD(intr_event_post_filter,	atpic_eoi),
+
 	X86PIC_FUNC(pic_register_sources,	atpic_register_sources),
-	X86PIC_FUNC(pic_enable_source,		atpic_enable_source),
-	X86PIC_FUNC(pic_disable_source,		atpic_disable_source),
-	X86PIC_FUNC(pic_eoi_source,		atpic_eoi),
 	X86PIC_FUNC(pic_enable_intr,		atpic_enable_intr),
 	X86PIC_FUNC(pic_disable_intr,		atpic_disable_intr),
 	X86PIC_FUNC(pic_source_pending,		atpic_source_pending),
