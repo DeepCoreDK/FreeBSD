@@ -95,7 +95,7 @@ inthand_t
 			.pic_register_sources = atpic_register_sources,	\
 			.pic_enable_source = atpic_enable_source,	\
 			.pic_disable_source = atpic_disable_source,	\
-			.pic_eoi_source = (eoi),			\
+			.pic_eoi_source = atpic_eoi,			\
 			.pic_enable_intr = atpic_enable_intr,		\
 			.pic_disable_intr = atpic_disable_intr,		\
 			.pic_source_pending = atpic_source_pending,	\
@@ -103,6 +103,7 @@ inthand_t
 			.pic_config_intr = atpic_config_intr,		\
 			.pic_assign_cpu = atpic_assign_cpu		\
 		},							\
+		.at_eoi_func = (eoi),					\
 		.at_ioaddr = (io),					\
 		.at_irqbase = (base),					\
 		.at_intbase = IDT_IO_INTS + (base),			\
@@ -119,6 +120,7 @@ inthand_t
 
 struct atpic {
 	struct pic at_pic;
+	void	(*at_eoi_func)(struct intsrc *isrc);
 	int	at_ioaddr;
 	int	at_irqbase;
 	uint8_t	at_intbase;
@@ -137,6 +139,7 @@ struct atpic_intsrc {
 static void atpic_register_sources(struct pic *pic);
 static void atpic_enable_source(struct intsrc *isrc);
 static void atpic_disable_source(struct intsrc *isrc);
+static void atpic_eoi(struct intsrc *isrc);
 static void atpic_eoi_master(struct intsrc *isrc);
 static void atpic_eoi_slave(struct intsrc *isrc);
 static void atpic_enable_intr(struct intsrc *isrc);
@@ -276,6 +279,14 @@ atpic_disable_source(struct intsrc *isrc)
 		_atpic_eoi_slave(isrc);
 
 	spinlock_exit();
+}
+
+static void
+atpic_eoi(struct intsrc *isrc)
+{
+	struct atpic *ap = (struct atpic *)isrc->is_pic;
+
+	ap->at_eoi_func(isrc);
 }
 
 static void
