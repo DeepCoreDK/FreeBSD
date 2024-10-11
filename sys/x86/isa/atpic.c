@@ -91,18 +91,7 @@ inthand_t
 	IDTVEC(atpic_intr14_pti), IDTVEC(atpic_intr15_pti);
 
 #define	ATPIC(io, base, eoi) {						\
-		.at_pic = {						\
-			.pic_register_sources = atpic_register_sources,	\
-			.pic_enable_source = atpic_enable_source,	\
-			.pic_disable_source = atpic_disable_source,	\
-			.pic_eoi_source = atpic_eoi,			\
-			.pic_enable_intr = atpic_enable_intr,		\
-			.pic_disable_intr = atpic_disable_intr,		\
-			.pic_source_pending = atpic_source_pending,	\
-			.pic_resume = atpic_resume,			\
-			.pic_config_intr = atpic_config_intr,		\
-			.pic_assign_cpu = atpic_assign_cpu		\
-		},							\
+		.at_pic = atpic_funcs,					\
 		.at_eoi_func = (eoi),					\
 		.at_ioaddr = (io),					\
 		.at_irqbase = (base),					\
@@ -150,6 +139,19 @@ static int atpic_config_intr(struct intsrc *isrc, enum intr_trigger trig,
     enum intr_polarity pol);
 static int atpic_assign_cpu(struct intsrc *isrc, u_int apic_id);
 static void i8259_init(struct atpic *pic, int slave);
+
+const struct pic atpic_funcs = {
+	.pic_register_sources = atpic_register_sources,
+	.pic_enable_source = atpic_enable_source,
+	.pic_disable_source = atpic_disable_source,
+	.pic_eoi_source = atpic_eoi,
+	.pic_enable_intr = atpic_enable_intr,
+	.pic_disable_intr = atpic_disable_intr,
+	.pic_source_pending = atpic_source_pending,
+	.pic_resume = atpic_resume,
+	.pic_config_intr = atpic_config_intr,
+	.pic_assign_cpu = atpic_assign_cpu,
+};
 
 static struct atpic atpics[] = {
 	ATPIC(IO_ICU1, 0, atpic_eoi_master),
