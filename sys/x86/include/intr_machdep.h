@@ -34,7 +34,7 @@
 
 DECLARE_CLASS(pic_base_class);
 
-typedef struct { } pic_base_softc_t;
+typedef struct { device_t next, prev; } pic_base_softc_t;
 
 /*
  * Values used in determining the allocation of IRQ values among
