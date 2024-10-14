@@ -28,8 +28,6 @@
 #ifndef	__MACHINE_INTERRUPT_H__
 #define	__MACHINE_INTERRUPT_H__
 
-#define INTR_EVENT_SOURCE_POINTERS
-
 /* FreeBSD standard interrupt controller interface */
 
 #include <sys/kobj.h>
