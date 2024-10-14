@@ -445,7 +445,7 @@ isrc_alloc_irq(struct intr_irqsrc *isrc)
 	return (ENOSPC);
 
 found:
-	error = intr_event_init(&isrc->isrc_event, isrc->isrc_dev, isrc, irq, 0,
+	error = intr_event_init(&isrc->isrc_event, isrc->isrc_dev, irq, 0,
 	    "%s:", isrc->isrc_name);
 	if (error != 0)
 		return (error);
