@@ -260,7 +260,7 @@ intr_register_source(u_int vector, struct intsrc *isrc, device_t pic)
 	isrc->is_pic = pic;
 	sx_xlock(&intrsrc_lock);
 	if (interrupt_sources[vector] == NULL)
-		error = intr_event_init(&isrc->is_event, pic, isrc, vector, 0,
+		error = intr_event_init(&isrc->is_event, pic, vector, 0,
 		    "irq%d:", vector);
 	else
 		error = EEXIST;
