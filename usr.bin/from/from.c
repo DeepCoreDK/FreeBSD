@@ -30,6 +30,7 @@
  */
 
 #include <sys/types.h>
+
 #include <ctype.h>
 #include <err.h>
 #include <pwd.h>
