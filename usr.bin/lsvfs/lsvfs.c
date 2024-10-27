@@ -5,6 +5,7 @@
  *
  */
 
+#include <sys/capsicum.h>
 #include <sys/param.h>
 #include <sys/mount.h>
 #include <sys/sysctl.h>
@@ -13,6 +14,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <libcasper.h>
+#include <casper/cap_sysctl.h>
 
 #define FMT	"%-32.32s 0x%08x %5d  %s\n"
 #define HDRFMT	"%-32.32s %10s %5.5s  %s\n"
@@ -41,8 +45,24 @@ main(int argc, char **argv)
 	struct xvfsconf vfc, *xvfsp;
 	size_t buflen;
 	int cnt, rv = 0;
+	cap_channel_t *capcas, *capsysctl;
+	cap_sysctl_limit_t *limit;
 
 	argc--, argv++;
+
+	if ((capcas = cap_init()) == NULL)
+		err(EXIT_FAILURE, "unable to contact Casper");
+	if ((capsysctl = cap_service_open(capcas, "system.sysctl")) == NULL)
+		err(EXIT_FAILURE, "unable to open system.sysctl servic");
+	cap_close(capcas);
+
+	limit = cap_sysctl_limit_init(capsysctl);
+	cap_sysctl_limit_name(limit, "vfs.conflist", CAP_SYSCTL_READ);
+	if (cap_sysctl_limit(limit) < 0)
+		err(EXIT_FAILURE, "unable to set limits");
+
+	if (cap_enter() < 0)
+		err(EXIT_FAILURE, "failed to enter capability mode");
 
 	printf(HDRFMT, "Filesystem", "Num", "Refs", "Flags");
 	fputs(DASHES, stdout);
@@ -58,11 +78,11 @@ main(int argc, char **argv)
 			}
 		}
 	} else {
-		if (sysctlbyname("vfs.conflist", NULL, &buflen, NULL, 0) < 0)
+		if (cap_sysctlbyname(capsysctl, "vfs.conflist", NULL, &buflen, NULL, 0) < 0)
 			err(EXIT_FAILURE, "sysctl(vfs.conflist)");
 		if ((xvfsp = malloc(buflen)) == NULL)
 			errx(EXIT_FAILURE, "malloc failed");
-		if (sysctlbyname("vfs.conflist", xvfsp, &buflen, NULL, 0) < 0)
+		if (cap_sysctlbyname(capsysctl, "vfs.conflist", xvfsp, &buflen, NULL, 0) < 0)
 			err(EXIT_FAILURE, "sysctl(vfs.conflist)");
 		cnt = buflen / sizeof(struct xvfsconf);
 
