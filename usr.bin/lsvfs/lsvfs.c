@@ -61,7 +61,7 @@ main(int argc, char **argv)
 	if (cap_sysctl_limit(limit) < 0)
 		err(EXIT_FAILURE, "unable to set limits");
 
-	if (cap_enter() < 0)
+	if (caph_enter_casper() != 0)
 		err(EXIT_FAILURE, "failed to enter capability mode");
 
 	printf(HDRFMT, "Filesystem", "Num", "Refs", "Flags");
