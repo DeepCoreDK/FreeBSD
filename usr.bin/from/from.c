@@ -30,6 +30,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/capsicum.h>
 
 #include <ctype.h>
 #include <err.h>
@@ -56,6 +57,7 @@ main(int argc, char **argv)
 #else
 	char buf[BUFSIZ];
 #endif
+	cap_rights_t rights;
 
 	file = sender = NULL;
 	count = -1;
@@ -100,6 +102,11 @@ main(int argc, char **argv)
 		mbox = stdin;
 	else if ((mbox = fopen(file, "r")) == NULL)
 		errx(1, "can't read %s", file);
+	if (cap_enter() < 0 && errno != ENOSYS)
+		err(EXIT_FAILURE, "failed to enter capability mode");
+	cap_rights_init(&rights, CAP_READ);
+	if (cap_rights_limit(fileno(mbox), &rights) < 0 && errno != ENOSYS)
+		err(EXIT_FAILURE, "unable to limit rights");
 	for (newline = 1; fgets(buf, sizeof(buf), mbox);) {
 		if (*buf == '\n') {
 			newline = 1;
