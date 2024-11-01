@@ -33,6 +33,7 @@
  */
 
 #include <sys/types.h>
+#include <sys/capsicum.h>
 #include <sys/queue.h>
 
 #include <err.h>
@@ -74,6 +75,7 @@ main(int argc, char *argv[])
 	wchar_t *warg;
 	const char *arg;
 	size_t len;
+	cap_rights_t rights;
 
 	STAILQ_INIT(&lh);
 	setlocale(LC_CTYPE, "");
@@ -124,12 +126,21 @@ main(int argc, char *argv[])
 			else
 				failed = errno;
 		}
+
+		if (cap_rights_limit(fileno(lp->fp),
+		    cap_rights_init(&rights, CAP_READ)) < 0 &&
+		    errno != ENOSYS)
+			err(EXIT_FAILURE, "unable to limit rights for %s", *argv);
+
 		lp->cnt = filecnt;
 		lp->err = failed;
 		lp->name = *argv;
 
 		STAILQ_INSERT_TAIL(&lh, lp, entries);
 	}
+
+	if (cap_enter() < 0 && errno != ENOSYS)
+		err(EXIT_FAILURE, "failed to enter capability mode");
 
 	rval = seq ? sequential() : parallel();
 
