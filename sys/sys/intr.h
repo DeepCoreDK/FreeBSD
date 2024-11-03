@@ -39,13 +39,9 @@
 
 /* FreeBSD standard interrupt controller interface */
 
-#include <sys/kobj.h>
-
 typedef struct intr_irqsrc interrupt_t;
 
 #include <sys/interrupt.h>
-
-DECLARE_CLASS(pic_base_class);
 
 /* FreeBSD standard interrupt controller interface */
 
