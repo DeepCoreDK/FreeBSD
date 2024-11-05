@@ -76,7 +76,7 @@ struct intsrc;
 struct pic {
 	void (*pic_register_sources)(struct pic *);
 	void (*pic_enable_source)(struct intsrc *);
-	void (*pic_disable_source)(struct intsrc *, int);
+	void (*pic_disable_source)(struct intsrc *);
 	void (*pic_eoi_source)(struct intsrc *);
 	void (*pic_enable_intr)(struct intsrc *);
 	void (*pic_disable_intr)(struct intsrc *);
@@ -88,12 +88,6 @@ struct pic {
 	int (*pic_assign_cpu)(struct intsrc *, u_int apic_id);
 	void (*pic_reprogram_pin)(struct intsrc *);
 	TAILQ_ENTRY(pic) pics;
-};
-
-/* Flags for pic_disable_source() */
-enum {
-	PIC_EOI,
-	PIC_NO_EOI,
 };
 
 /*

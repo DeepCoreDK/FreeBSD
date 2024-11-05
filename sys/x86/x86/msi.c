@@ -127,7 +127,6 @@ struct msi_intsrc {
 
 static void	msi_create_source(void);
 static void	msi_enable_source(struct intsrc *isrc);
-static void	msi_disable_source(struct intsrc *isrc, int eoi);
 static void	msi_eoi_source(struct intsrc *isrc);
 static void	msi_enable_intr(struct intsrc *isrc);
 static void	msi_disable_intr(struct intsrc *isrc);
@@ -138,7 +137,7 @@ static int	msi_assign_cpu(struct intsrc *isrc, u_int apic_id);
 
 struct pic msi_pic = {
 	.pic_enable_source = msi_enable_source,
-	.pic_disable_source = msi_disable_source,
+	.pic_disable_source = msi_eoi_source,
 	.pic_eoi_source = msi_eoi_source,
 	.pic_enable_intr = msi_enable_intr,
 	.pic_disable_intr = msi_disable_intr,
@@ -181,14 +180,6 @@ static struct mtx msi_lock;
 static void
 msi_enable_source(struct intsrc *isrc)
 {
-}
-
-static void
-msi_disable_source(struct intsrc *isrc, int eoi)
-{
-
-	if (eoi == PIC_EOI)
-		lapic_eoi();
 }
 
 static void

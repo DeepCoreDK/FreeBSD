@@ -113,7 +113,7 @@ static const char *ioapic_bus_string(int bus_type);
 static void	ioapic_print_irq(struct ioapic_intsrc *intpin);
 static void	ioapic_register_sources(struct pic *pic);
 static void	ioapic_enable_source(struct intsrc *isrc);
-static void	ioapic_disable_source(struct intsrc *isrc, int eoi);
+static void	ioapic_disable_source(struct intsrc *isrc);
 static void	ioapic_eoi_source(struct intsrc *isrc);
 static void	ioapic_enable_intr(struct intsrc *isrc);
 static void	ioapic_disable_intr(struct intsrc *isrc);
@@ -275,7 +275,7 @@ ioapic_enable_source(struct intsrc *isrc)
 }
 
 static void
-ioapic_disable_source(struct intsrc *isrc, int eoi)
+ioapic_disable_source(struct intsrc *isrc)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
 	struct ioapic *io = (struct ioapic *)isrc->is_pic;
@@ -289,8 +289,7 @@ ioapic_disable_source(struct intsrc *isrc, int eoi)
 		intpin->io_masked = 1;
 	}
 
-	if (eoi == PIC_EOI)
-		_ioapic_eoi_source(isrc, 1);
+	_ioapic_eoi_source(isrc, 1);
 
 	mtx_unlock_spin(&icu_lock);
 }
@@ -511,7 +510,18 @@ static void
 ioapic_disable_intr(struct intsrc *isrc)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
+	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	uint32_t flags;
 	u_int vector;
+
+	mtx_lock_spin(&icu_lock);
+	if (!intpin->io_masked && !intpin->io_edgetrigger) {
+		flags = intpin->io_lowreg | IOART_INTMSET;
+		ioapic_write(io->io_addr, IOAPIC_REDTBL_LO(intpin->io_intpin),
+		    flags);
+		intpin->io_masked = 1;
+	}
+	mtx_unlock_spin(&icu_lock);
 
 	if (intpin->io_vector != 0) {
 		/* Mask this interrupt pin and free its APIC vector. */
