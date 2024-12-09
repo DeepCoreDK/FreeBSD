@@ -55,6 +55,8 @@
 #include <machine/segments.h>
 #include <x86/iommu/iommu_intrmap.h>
 
+#define	X86PIC_TYPE ioapic
+
 #define IOAPIC_ISA_INTS		16
 #define	IOAPIC_MEM_REGION	32
 #define	IOAPIC_REDTBL_LO(i)	(IOAPIC_REDTBL + (i) * 2)
@@ -153,7 +155,7 @@ static void
 _ioapic_eoi_source(struct intsrc *isrc, int locked)
 {
 	struct ioapic_intsrc *src;
-	struct ioapic *io;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	volatile uint32_t *apic_eoi;
 	uint32_t low1;
 
@@ -163,7 +165,6 @@ _ioapic_eoi_source(struct intsrc *isrc, int locked)
 	src = (struct ioapic_intsrc *)isrc;
 	if (src->io_edgetrigger)
 		return;
-	io = (struct ioapic *)isrc->is_pic;
 
 	/*
 	 * Handle targeted EOI for level-triggered pins, if broadcast
@@ -262,7 +263,7 @@ static void
 ioapic_enable_source(struct intsrc *isrc)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
-	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	uint32_t flags;
 
 	mtx_lock_spin(&icu_lock);
@@ -279,7 +280,7 @@ static void
 ioapic_disable_source(struct intsrc *isrc)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
-	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	uint32_t flags;
 
 	mtx_lock_spin(&icu_lock);
@@ -309,7 +310,7 @@ ioapic_eoi_source(struct intsrc *isrc)
 static void
 ioapic_program_intpin(struct ioapic_intsrc *intpin)
 {
-	struct ioapic *io = (struct ioapic *)intpin->io_intsrc.is_pic;
+	struct ioapic *io = X86PIC_PIC(intpin->io_intsrc.is_pic);
 	uint32_t low, high;
 #ifdef IOMMU
 	int error;
@@ -416,7 +417,7 @@ static int
 ioapic_assign_cpu(struct intsrc *isrc, u_int apic_id)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
-	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	u_int old_vector, new_vector;
 	u_int old_id;
 
@@ -511,7 +512,7 @@ static void
 ioapic_disable_intr(struct intsrc *isrc)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
-	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	uint32_t flags;
 	u_int vector;
 
@@ -552,7 +553,7 @@ ioapic_config_intr(struct intsrc *isrc, enum intr_trigger trig,
     enum intr_polarity pol)
 {
 	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
-	struct ioapic *io = (struct ioapic *)isrc->is_pic;
+	struct ioapic *io = X86PIC_PIC(isrc->is_pic);
 	int changed;
 
 	KASSERT(!(trig == INTR_TRIGGER_CONFORM || pol == INTR_POLARITY_CONFORM),
@@ -594,7 +595,7 @@ ioapic_config_intr(struct intsrc *isrc, enum intr_trigger trig,
 static void
 ioapic_resume(x86pic_t pic, bool suspend_cancelled)
 {
-	struct ioapic *io = (struct ioapic *)pic;
+	struct ioapic *io = X86PIC_PIC(pic);
 	int i;
 
 	mtx_lock_spin(&icu_lock);
@@ -923,10 +924,9 @@ static void
 ioapic_register_sources(x86pic_t pic)
 {
 	struct ioapic_intsrc *pin;
-	struct ioapic *io;
+	struct ioapic *io = X86PIC_PIC(pic);
 	int i;
 
-	io = (struct ioapic *)pic;
 	for (i = 0, pin = io->io_pins; i < io->io_numintr; i++, pin++) {
 		if (pin->io_irq >= 0)
 			intr_register_source(pin->io_irq, &pin->io_intsrc);
