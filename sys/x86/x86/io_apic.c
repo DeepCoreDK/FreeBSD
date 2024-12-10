@@ -129,7 +129,8 @@ static int	ioapic_config_intr(x86pic_t pic, struct intsrc *isrc,
 static void	ioapic_resume(x86pic_t pic, bool suspend_cancelled);
 static int	ioapic_assign_cpu(x86pic_t pic, struct intsrc *isrc,
 		    u_int apic_id);
-static void	ioapic_program_intpin(struct ioapic_intsrc *intpin);
+static void	ioapic_program_intpin(struct ioapic *pic,
+		    struct ioapic_intsrc *intpin);
 static void	ioapic_reprogram_intpin(x86pic_t pic, struct intsrc *isrc);
 
 static STAILQ_HEAD(,ioapic) ioapic_list = STAILQ_HEAD_INITIALIZER(ioapic_list);
@@ -315,9 +316,8 @@ ioapic_eoi_source(x86pic_t pic, struct intsrc *isrc)
  * structure.
  */
 static void
-ioapic_program_intpin(struct ioapic_intsrc *intpin)
+ioapic_program_intpin(struct ioapic *io, struct ioapic_intsrc *intpin)
 {
-	struct ioapic *io = X86PIC_PIC(intpin->io_intsrc.is_pic);
 	uint32_t low, high;
 #ifdef IOMMU
 	int error;
@@ -414,9 +414,11 @@ ioapic_program_intpin(struct ioapic_intsrc *intpin)
 static void
 ioapic_reprogram_intpin(x86pic_t pic, struct intsrc *isrc)
 {
+	struct ioapic_intsrc *intpin = (struct ioapic_intsrc *)isrc;
+	struct ioapic *io = device_get_softc(isrc->is_pic);
 
 	mtx_lock_spin(&icu_lock);
-	ioapic_program_intpin((struct ioapic_intsrc *)isrc);
+	ioapic_program_intpin(io, intpin);
 	mtx_unlock_spin(&icu_lock);
 }
 
@@ -488,7 +490,7 @@ ioapic_assign_cpu(x86pic_t pic, struct intsrc *isrc, u_int apic_id)
 		printf(") to lapic %u vector %u\n", intpin->io_cpu,
 		    intpin->io_vector);
 	}
-	ioapic_program_intpin(intpin);
+	ioapic_program_intpin(io, intpin);
 	mtx_unlock_spin(&icu_lock);
 
 	/*
@@ -539,7 +541,7 @@ ioapic_disable_intr(x86pic_t pic, struct intsrc *isrc)
 		mtx_lock_spin(&icu_lock);
 		intpin->io_masked = 1;
 		intpin->io_vector = 0;
-		ioapic_program_intpin(intpin);
+		ioapic_program_intpin(io, intpin);
 		mtx_unlock_spin(&icu_lock);
 		apic_free_vector(intpin->io_cpu, vector, intpin->io_irq);
 	}
@@ -594,7 +596,7 @@ ioapic_config_intr(x86pic_t pic, struct intsrc *isrc, enum intr_trigger trig,
 		changed++;
 	}
 	if (changed)
-		ioapic_program_intpin(intpin);
+		ioapic_program_intpin(io, intpin);
 	mtx_unlock_spin(&icu_lock);
 	return (0);
 }
@@ -607,7 +609,7 @@ ioapic_resume(x86pic_t pic, bool suspend_cancelled)
 
 	mtx_lock_spin(&icu_lock);
 	for (i = 0; i < io->io_numintr; i++)
-		ioapic_program_intpin(&io->io_pins[i]);
+		ioapic_program_intpin(io, &io->io_pins[i]);
 	mtx_unlock_spin(&icu_lock);
 }
 
@@ -924,7 +926,7 @@ ioapic_register(ioapic_drv_t io)
 	 * SMI) and disable normal pins until a handler is registered.
 	 */
 	for (i = 0, pin = io->io_pins; i < io->io_numintr; i++, pin++)
-		ioapic_program_intpin(pin);
+		ioapic_program_intpin(io, pin);
 	mtx_unlock_spin(&icu_lock);
 }
 
