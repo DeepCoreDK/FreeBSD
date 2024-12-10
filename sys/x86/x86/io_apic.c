@@ -891,7 +891,6 @@ ioapic_register(ioapic_drv_t io)
 	mtx_lock_spin(&icu_lock);
 	flags = ioapic_read(apic, IOAPIC_VER) & IOART_VER_VERSION;
 	STAILQ_INSERT_TAIL(&ioapic_list, io, io_next);
-	mtx_unlock_spin(&icu_lock);
 	printf("ioapic%u <Version %u.%u> irqs %u-%u\n",
 	    io->io_id, flags >> 4, flags & 0xf, io->io_intbase,
 	    io->io_intbase + io->io_numintr - 1);
@@ -902,7 +901,8 @@ ioapic_register(ioapic_drv_t io)
 	 */
 	intr_register_pic(&io->io_pic);
 	for (i = 0, pin = io->io_pins; i < io->io_numintr; i++, pin++)
-		ioapic_reprogram_intpin(&pin->io_intsrc);
+		ioapic_program_intpin(pin);
+	mtx_unlock_spin(&icu_lock);
 }
 
 /*
