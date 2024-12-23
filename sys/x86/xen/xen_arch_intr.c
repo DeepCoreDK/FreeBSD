@@ -192,24 +192,6 @@ xen_intr_pic_disable_intr(struct intsrc *isrc)
 }
 
 /**
- * Determine whether or not interrupt events are pending on the
- * the given interrupt source.
- *
- * \param isrc  The interrupt source to query.
- *
- * \returns  0 if no events are pending, otherwise non-zero.
- */
-static int
-xen_intr_pic_source_pending(struct intsrc *isrc)
-{
-	/*
-	 * EventChannels are edge triggered and never masked.
-	 * There can be no pending events.
-	 */
-	return (0);
-}
-
-/**
  * Prepare this PIC for system suspension.
  */
 static void
@@ -264,7 +246,6 @@ static struct pic xen_intr_pic = {
 	.pic_eoi_source     = xen_intr_pic_eoi_source,
 	.pic_enable_intr    = xen_intr_pic_enable_intr,
 	.pic_disable_intr   = xen_intr_pic_disable_intr,
-	.pic_source_pending = xen_intr_pic_source_pending,
 	.pic_suspend        = xen_intr_pic_suspend,
 	.pic_resume         = xen_intr_pic_resume,
 	.pic_config_intr    = xen_intr_pic_config_intr,
