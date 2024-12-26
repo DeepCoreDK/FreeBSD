@@ -89,11 +89,8 @@ static device_method_t  opalflash_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t opalflash_driver = {
-	"opalflash",
-	opalflash_methods,
-	sizeof(struct opalflash_softc)
-};
+DEFINE_CLASS_0(opalflash, opalflash_driver, opalflash_methods,
+    sizeof(struct opalflash_softc));
 
 DRIVER_MODULE(opalflash, opal, opalflash_driver, 0, 0);
 

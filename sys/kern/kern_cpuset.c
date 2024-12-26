@@ -59,7 +59,6 @@
 #include <sys/libkern.h>
 #include <sys/limits.h>
 #include <sys/bus.h>
-#include <sys/interrupt.h>
 #include <sys/vmmeter.h>
 #include <sys/ktrace.h>
 
@@ -76,6 +75,8 @@
 #ifdef DDB
 #include <ddb/ddb.h>
 #endif /* DDB */
+
+#include <machine/interrupt.h>
 
 /*
  * cpusets provide a mechanism for creating and manipulating sets of

@@ -81,14 +81,11 @@ static device_method_t glc_methods[] = {
 	/* Device interface */
 	DEVMETHOD(device_probe,		glc_probe),
 	DEVMETHOD(device_attach,	glc_attach),
-	{ 0, 0 }
+
+	DEVMETHOD_END
 };
 
-static driver_t glc_driver = {
-	"glc",
-	glc_methods,
-	sizeof(struct glc_softc)
-};
+DEFINE_CLASS_0(glc, glc_driver, glc_methods, sizeof(struct glc_softc));
 
 DRIVER_MODULE(glc, ps3bus, glc_driver, 0, 0);
 

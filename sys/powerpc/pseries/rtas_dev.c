@@ -62,14 +62,10 @@ static device_method_t  rtasdev_methods[] = {
 	DEVMETHOD(clock_gettime,	rtas_gettime),
 	DEVMETHOD(clock_settime,	rtas_settime),
 
-	{ 0, 0 },
+	DEVMETHOD_END
 };
 
-static driver_t rtasdev_driver = {
-	"rtas",
-	rtasdev_methods,
-	0
-};
+DEFINE_CLASS_0(rtas, rtasdev_driver, rtasdev_methods, 0);
 
 DRIVER_MODULE(rtasdev, ofwbus, rtasdev_driver, 0, 0);
 

@@ -99,14 +99,11 @@ static device_method_t pmcr_methods[] = {
 	DEVMETHOD(cpufreq_drv_get,	pmcr_get),
 	DEVMETHOD(cpufreq_drv_type,	pmcr_type),
 	DEVMETHOD(cpufreq_drv_settings,	pmcr_settings),
-	{0, 0}
+
+	DEVMETHOD_END
 };
 
-static driver_t pmcr_driver = {
-	"pmcr",
-	pmcr_methods,
-	sizeof(struct pmcr_softc)
-};
+DEFINE_CLASS_0(pmcr, pmcr_driver, pmcr_methods, sizeof(struct pmcr_softc));
 
 DRIVER_MODULE(pmcr, cpu, pmcr_driver, 0, 0);
 

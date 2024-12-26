@@ -100,7 +100,6 @@
 
 #include <sys/param.h>
 #include <sys/bus.h>
-#include <sys/interrupt.h>
 #include <sys/module.h>
 #include <sys/kernel.h>
 #include <sys/hhook.h>
@@ -119,6 +118,8 @@
 #include <sys/time.h>
 #include <sys/kthread.h>
 #include <sys/kern_prefetch.h>
+
+#include <machine/interrupt.h>
 
 #include <vm/uma.h>
 #include <vm/vm.h>

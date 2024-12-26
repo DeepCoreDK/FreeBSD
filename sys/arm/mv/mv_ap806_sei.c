@@ -39,7 +39,7 @@
 #include <sys/mutex.h>
 
 #include <machine/bus.h>
-#include <machine/intr.h>
+#include <machine/interrupt.h>
 #include <machine/resource.h>
 
 #include <dev/fdt/simplebus.h>
@@ -477,15 +477,17 @@ static device_method_t mv_ap806_sei_methods[] = {
 	DEVMETHOD(device_attach,	mv_ap806_sei_attach),
 	DEVMETHOD(device_detach,	mv_ap806_sei_detach),
 
+	/* Interrupt event interface */
+	DEVMETHOD(intr_event_pre_ithread,	mv_ap806_sei_pre_ithread),
+	DEVMETHOD(intr_event_post_ithread,	mv_ap806_sei_post_ithread),
+	DEVMETHOD(intr_event_post_filter,	mv_ap806_sei_post_filter),
+
 	/* Interrupt controller interface */
 	DEVMETHOD(pic_disable_intr,	mv_ap806_sei_disable_intr),
 	DEVMETHOD(pic_enable_intr,	mv_ap806_sei_enable_intr),
 	DEVMETHOD(pic_map_intr,		mv_ap806_sei_map_intr),
 	DEVMETHOD(pic_setup_intr,	mv_ap806_sei_setup_intr),
 	DEVMETHOD(pic_teardown_intr,	mv_ap806_sei_teardown_intr),
-	DEVMETHOD(pic_post_filter,	mv_ap806_sei_post_filter),
-	DEVMETHOD(pic_post_ithread,	mv_ap806_sei_post_ithread),
-	DEVMETHOD(pic_pre_ithread,	mv_ap806_sei_pre_ithread),
 
 	/* MSI interface */
 	DEVMETHOD(msi_alloc_msi,	mv_ap806_sei_alloc_msi),
@@ -495,11 +497,8 @@ static device_method_t mv_ap806_sei_methods[] = {
 	DEVMETHOD_END
 };
 
-static driver_t mv_ap806_sei_driver = {
-	"mv_ap806_sei",
-	mv_ap806_sei_methods,
-	sizeof(struct mv_ap806_sei_softc),
-};
+DEFINE_CLASS_1(mv_ap806_sei, mv_ap806_sei_driver, mv_ap806_sei_methods,
+    sizeof(struct mv_ap806_sei_softc), pic_base_class);
 
 EARLY_DRIVER_MODULE(mv_ap806_sei, simplebus, mv_ap806_sei_driver, 0, 0,
     BUS_PASS_INTERRUPT + BUS_PASS_ORDER_MIDDLE);

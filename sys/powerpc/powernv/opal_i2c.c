@@ -105,11 +105,8 @@ static device_method_t opal_i2c_methods[] = {
 	mtx_init(&_sc->sc_mtx, device_get_nameunit(_sc->dev), \
 	    "i2c", MTX_DEF)
 
-static driver_t opal_i2c_driver = {
-	"iichb",
-	opal_i2c_methods,
-	sizeof(struct opal_i2c_softc),
-};
+DEFINE_CLASS_0(iichb, opal_i2c_driver, opal_i2c_methods,
+    sizeof(struct opal_i2c_softc));
 
 static int
 opal_i2c_probe(device_t dev)
